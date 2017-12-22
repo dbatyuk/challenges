@@ -5,13 +5,13 @@ cd $(dirname $0)
 
 dev_build() {
   # Do what you need to package your app, e.g. mvn package
-  true
+  mvn clean package
 }
 
 dev_run() {
   # Do what you need to run your app in the foreground
   # e.g. java -jar target/magic.jar $*
-  sleep 600
+  java -Xmx6g -jar target/busroute-1.0.0-SNAPSHOT.jar $*
 }
 
 dev_smoke() {

@@ -8,8 +8,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -24,12 +26,12 @@ public class BusRouteFileParser {
 
     private static final Logger log = LoggerFactory.getLogger(BusRouteFileParser.class);
 
-    public Map<Integer, List<Integer>> parseRoutes(String filePath) {
+    public Map<Integer, Set<Integer>> parseRoutes(String filePath) {
         Preconditions.checkArgument(!isNullOrEmpty(filePath), "filePath can't be null or empty");
         log.info("start parseRoutes file {}", filePath);
 
         try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
-            Map<Integer, List<Integer>> routes = new HashMap<>();
+            Map<Integer, Set<Integer>> stationRoutes = new HashMap<>();
 
             stream.filter(r -> r.indexOf(" ") > 0).forEach(route -> {
                 String[] split = route.split(" ");
@@ -38,12 +40,16 @@ public class BusRouteFileParser {
                 List<Integer> routeStations = Arrays.stream(split, 1, split.length).map(Integer::valueOf).collect(toList());
 
                 if (routeStations != null && !routeStations.isEmpty()) {
-                    routes.put(busRouteNumb, routeStations);
+                    routeStations.forEach(station -> {
+                        Set<Integer> relatedRoutes = stationRoutes.getOrDefault(station, new HashSet<>());
+                        relatedRoutes.add(busRouteNumb);
+                        stationRoutes.put(station, relatedRoutes);
+                    });
                 }
             });
 
-            log.info("finish parseRoutes, routes {},  file {}", routes.size(), filePath);
-            return routes;
+            log.info("finish parseRoutes, routes {},  file {}", stationRoutes.size(), filePath);
+            return stationRoutes;
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }

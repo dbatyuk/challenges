@@ -1,12 +1,12 @@
 package com.busroute.dao.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,14 +25,24 @@ public class BusRouteFileParserTest {
 
     @Test
     public void test() {
-        Map<Integer, List<Integer>> map = busRouteFileParser.parseRoutes(new File("src/test/resources/test").getAbsolutePath());
-        assertEquals(1, map.size());
-        List<Integer> stations = map.get(2);
-        assertNotNull(stations);
-        assertEquals(5, stations.get(0).intValue());
-        assertEquals(142, stations.get(1).intValue());
-        assertEquals(106, stations.get(2).intValue());
-        assertEquals(11, stations.get(3).intValue());
+        Map<Integer, Set<Integer>> map = busRouteFileParser.parseRoutes(new File("src/test/resources/test").getAbsolutePath());
+
+        assertEquals(5, map.size());
+        assertEquals(1, map.get(6).size());
+        assertTrue(map.get(6).contains(1));
+
+        assertEquals(1, map.get(106).size());
+        assertTrue(map.get(106).contains(1));
+
+        assertEquals(1, map.get(11).size());
+        assertTrue(map.get(11).contains(1));
+
+        assertEquals(1, map.get(150).size());
+        assertTrue(map.get(150).contains(4));
+
+        assertEquals(2, map.get(142).size());
+        assertTrue(map.get(142).contains(1));
+        assertTrue(map.get(142).contains(4));
     }
 
     @Test
